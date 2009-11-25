@@ -1,0 +1,16 @@
+=Version 0.0.4=
+  * add init-fw-pkgin-config hook
+
+=Version 0.0.3=
+  * Build with latest version of framewerk.
+  * set tar-ustar option
+  * bsd make fixes
+
+=Version 0.0.2=
+  * Automatically generate dep on framewerk in revision package.
+
+=Version 0.0.1=
+  * Build with latest framewerk (pick up enhancements).
+
+=Version 0.0.0=
+  * Initial version.

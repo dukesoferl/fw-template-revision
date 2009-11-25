@@ -1,0 +1,4 @@
+fw-template-revision provides a framewerk template for revision control 
+plugins.  For instance, if you wanted to add darcs support to framewerk,
+you could use the fw-revision template provided by this package for
+the project which supplied fw-revision-darcs.

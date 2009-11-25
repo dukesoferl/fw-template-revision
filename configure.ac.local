@@ -1,0 +1,8 @@
+dnl -- include additional autoconf commands here
+dnl -- do not include AC_OUTPUT, this is called for you
+
+AC_CONFIG_FILES([fw.local/m4/Makefile
+                 fw.local/template/NAME/fw.local/Makefile
+                 fw.local/template/NAME/fw.local/revision/Makefile
+                 fw.local/template/NAME/fw.local/revision/NAME/Makefile
+                 fw.local/template/NAME/tests/Makefile])
