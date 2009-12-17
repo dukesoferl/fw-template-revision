@@ -1,6 +1,6 @@
 #! /bin/sh
 
-if test -d ../fw/bin
+if test -d ../fw/bin  
   then
     PATH="`pwd`/../fw/bin:$PATH"
     export PATH
@@ -28,49 +28,59 @@ mkdir cvstmp
 )
 test -h fw.local || ln -sf ../fw.local fw.local || exit 1
 test -h share || ln -sf .. share || exit 1
-rm -rf tmp 
-FW_ROOT="`pwd`"
-export FW_ROOT
 CVSROOT="`pwd`/cvstmp"
 export CVSROOT
+testsdir="`pwd`"
 rm -rf megatmp
-(
+{ 
   mkdir megatmp &&
   cd megatmp &&
+  env FW_ROOT="$testsdir"                               \
   fw-init --name tmp                                    \
           --revision cvs                                \
           --revision_type flass                         \
-          --template fw-revision &&                     \
-  mv -f tmp .. &&                                       \
-  cd .. &&                                              \
-  rmdir megatmp                                         \
-) || exit 1
+          --template fw-revision      
+} || exit 1
 cd tmp
+rm -f fw
+mkdir fw
+cwd=`pwd`
+mkdir fw/bin
+cp `env PATH="../../../fw/bin:$PATH" which fw-bootstrap` fw/bin
+cp `env PATH="../../../fw/bin:$PATH" which fw-exec` fw/bin
+cp `env PATH="../../../fw/bin:$PATH" which fw-init` fw/bin
+cp `env PATH="../../../fw/bin:$PATH" which fw-package` fw/bin
+(cd "../../../fw"; find . -print | cpio -pvd "$cwd/fw")
+(cd "../../../fw.local"; find template -print | cpio -pvd "$cwd/fw")
+(cd "../../../fw.local"; find m4 -print | cpio -pvd "$cwd/fw")
 
-# disable the addition of fw-template-revision to the BUILD_DEPENDS since it 
+# disable the addition of fw-template-fw-revision to the BUILD_DEPENDS since it 
 # will not be installed at this point
-mkdir -p fw.local/template/fw-revision/ || exit 1
-cp "${FW_ROOT}/share/fw/build/automake/load-config" fw.local/template/fw-revision/ || \
+cp "${testsdir}/share/fw/build/automake/load-config" fw/template/fw-revision/ || \
 exit 1
-chmod +x fw.local/template/fw-revision/load-config || exit 1
+chmod +x fw/template/fw-revision/load-config || exit 1
 
-( cvs -n -q up | grep '^?' | grep -v fw.local ) && exit 1
+( cvs -n -q up | grep '^?' ) && exit 1
 ./bootstrap || exit 1
-( cvs -n -q up | grep '^?' | grep -v fw.local ) && exit 1
+( cvs -n -q up | grep '^?' ) && exit 1
 ./build || exit 1
-"$MAKE" -s check || exit 1
+( cvs -n -q up | grep '^?' ) && exit 1
+"${MAKE}" -s check || exit 1
+( cvs -n -q up | grep '^?' ) && exit 1
 
 if test "@FW_NATIVE_PACKAGE_TYPE@" != none
   then
-    "$MAKE" "package-@FW_NATIVE_PACKAGE_TYPE@" || exit 1
+    "${MAKE}" "package-@FW_NATIVE_PACKAGE_TYPE@" || exit 1
+    ( cvs -n -q up | grep '^?' | grep -v fw.local ) && exit 1
   fi
 
-"$MAKE" -s maintainer-clean
-( cvs -n -q up | grep '^?' | grep -v fw.local ) && exit 1
+"${MAKE}" -s maintainer-clean
+rm -rf fw
+( cvs -n -q up | grep '^?' ) && exit 1
 test -z "`find . -name '*.am'`" || exit 1
 ) > test-template.out 2>&1 || exit 1
 
 rm fw.local
 rm share
-rm -rf tmp
+rm -rf megatmp
 rm -rf cvstmp
