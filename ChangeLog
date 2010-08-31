@@ -1,3 +1,7 @@
+=Version 0.0.7=
+  * No license, the web page claimed new BSD but a COPYING file wasn't in
+  place with the license, so talked to Paul about it, then added it.
+
 =Version 0.0.6=
   * rpm tweaks
 
